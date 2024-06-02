@@ -1,7 +1,7 @@
 package net.andimiller.clowder.anomalydetection
 
 import cats.implicits.catsSyntaxOptionId
-import net.andimiller.clowder.RandomAdaptor.RandomADaptorSyntax
+import net.andimiller.clowder.RandomAdaptor.RandomAdaptorSyntax
 import net.andimiller.clowder.{AnomalyDetector, RandomAdaptor}
 
 import scala.annotation.tailrec
@@ -9,8 +9,8 @@ import scala.collection.mutable
 import scala.math.Ordered.orderingToOrdered
 import scala.util.Random
 
-class IsolationForests[T: Ordering: Numeric: RandomAdaptor](samples: Int = 256, stdDevs: Int = 1, maxDepth: Option[Int] = None)(implicit
-    random: Random
+class IsolationForestSimple[T: Ordering: Numeric: RandomAdaptor](samples: Int = 256, stdDevs: Int = 1, maxDepth: Option[Int] = None)(
+    implicit random: Random
 ) extends AnomalyDetector[T] {
 
   private final val EULERS_CONSTANT: Double = 0.5772156649d

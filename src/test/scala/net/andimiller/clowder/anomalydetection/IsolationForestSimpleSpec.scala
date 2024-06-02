@@ -6,11 +6,11 @@ import org.scalacheck.Prop.forAll
 
 import scala.util.Random
 
-class IsolationForestsSpec extends munit.FunSuite with ScalaCheckSuite {
+class IsolationForestSimpleSpec extends munit.FunSuite with ScalaCheckSuite {
 
   test("Should find anomaly in a custom list") {
     implicit val r = new Random(1234)
-    val alg        = new IsolationForests[Int](stdDevs = 1)
+    val alg        = new IsolationForestSimple[Int](stdDevs = 1)
     assertEquals(
       alg.findOutliers(Vector(1, 2, 3, 4, 5, 11)),
       Vector(11)
@@ -29,7 +29,7 @@ class IsolationForestsSpec extends munit.FunSuite with ScalaCheckSuite {
     implicit val extraValue: Arbitrary[Int]     = Arbitrary(Gen.choose(2500, 3000))
     forAll { (ints: Vector[Int], extra: Int) =>
       implicit val r = new Random(1234)
-      val alg        = new IsolationForests[Int](samples = 256, stdDevs = 1)
+      val alg        = new IsolationForestSimple[Int](samples = 256, stdDevs = 1)
       alg.findOutliers(
         r.shuffle(ints.appended(extra))
       ) == Vector(extra)
@@ -38,7 +38,7 @@ class IsolationForestsSpec extends munit.FunSuite with ScalaCheckSuite {
 
   test("Should find anomaly in a custom list with a max depth") {
     implicit val r = new Random(1234)
-    val alg        = new IsolationForests[Int](stdDevs = 1, maxDepth = Some(2))
+    val alg        = new IsolationForestSimple[Int](stdDevs = 1, maxDepth = Some(2))
     assertEquals(
       alg.findOutliers(Vector(1, 2, 3, 4, 5, 11)),
       Vector(11)
@@ -47,7 +47,7 @@ class IsolationForestsSpec extends munit.FunSuite with ScalaCheckSuite {
 
   property("should run with many longs") {
     implicit val r                            = new Random(1234)
-    val alg                                   = new IsolationForests[Long](samples = 32, stdDevs = 1, maxDepth = Some(2))
+    val alg                                   = new IsolationForestSimple[Long](samples = 32, stdDevs = 1, maxDepth = Some(2))
     implicit val gen: Arbitrary[Vector[Long]] = Arbitrary(
       Gen.choose(1, 1000).flatMap { size =>
         Gen.buildableOfN[Vector[Long], Long](size, Gen.long)
