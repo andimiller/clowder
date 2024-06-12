@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import munit.ScalaCheckSuite
 import net.andimiller.clowder.anomalydetection
 import org.scalacheck.Prop.forAll
+import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
 import scala.util.Random
@@ -66,6 +67,51 @@ class IsolationForestSpec extends munit.FunSuite with ScalaCheckSuite {
         Input("g", 1, 20),
         Input("whoa very long string", 3, 3)
       )
+    )
+  }
+
+  test("Should find anomaly in a custom list with derived facets") {
+    implicit val r = new Random(1234)
+    val alg        = new IsolationForest[Input](
+      extractors = NonEmptyList.of(
+        FacetExtractor(_.name.hashCode),
+        FacetExtractor(i => i.x - i.y)
+      ),
+      stdDevs = 1
+    )
+    assertEquals(
+      alg
+        .findOutliers(
+          Vector(
+            Input("a", 1, 1),
+            Input("b", 2, 2),
+            Input("whoa very long string", 3, 3),
+            Input("d", 4, 4),
+            Input("e", 5, 4),
+            Input("f", -30, -10),
+            Input("g", 1, 20),
+            Input("h", 1, 1),
+            Input("i", 1, 1),
+            Input("j", 1, 1),
+            Input("k", 1, 1)
+          )
+        )
+        .toSet,
+      Set(
+        Input("f", -30, -10),
+        Input("g", 1, 20),
+        Input("whoa very long string", 3, 3)
+      )
+    )
+  }
+
+  test("Should run with a large input list") {
+    implicit val r = new Random(1234)
+    val input      = Vector.fill(32768)(r.nextGaussian())
+    val alg        = new IsolationForest[Double](extractors = NonEmptyList.of(FacetExtractor(identity)), stdDevs = 4, samples = 32, maxDepth = 4)
+    assertEquals(
+      alg.findOutliers(input).size,
+      240
     )
   }
 
