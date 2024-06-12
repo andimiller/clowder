@@ -6,7 +6,7 @@ ThisBuild / scalaVersion := "2.13.13"
 
 lazy val root = (project in file("."))
   .settings(
-    organization := "net.andimiller",
+    organization           := "net.andimiller",
     name                   := "clowder",
     scalacOptions += "-opt:l:inline",
     libraryDependencies ++= List(
